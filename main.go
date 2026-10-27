@@ -15,16 +15,18 @@ func main() {
 
     lines := strings.Split(string(data), "\n")
 
-	var char string //a avr can hold the text
-	fmt.Print("enter one character: ") //display a mssg
-	fmt.Scanln(&char) //reads what the user types and store it in char 
-	number := int(char[0])
-	fmt.Println("Character number:", number)
-	fmt.Println("You entered:", char) //the output
+	var text string 
+	fmt.Print("enter a word: ") //display a mssg
+	fmt.Scanln(&text) //reads what the user types and store it in char 
+	
 
-    start := 10
-
-for i := start; i < start+8; i++ {
-    fmt.Println(lines[i])
-}
+		for i:=0; i<len(text); i++{
+			number := int(text[i]) 	//get the ascii nbr of the current char
+			start := 1 + (number-32)*9 //calculate the first line of its drawing 
+			//how do we know that !!!!! 
+			//cause we are using a standard file wish means we know where each draw start and end
+			for j:=start; j<start+8; j++{ //draw the 8 line belongs to that char 
+				fmt.Println(lines[j])
+			}
+  		}
 }
