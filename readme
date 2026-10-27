@@ -1,26 +1,23 @@
 # ASCII Art
 
-A simple command-line program written in **Go (Golang)** that converts text into ASCII art using predefined banner files.
+A command-line program written in **Go (Golang)** that converts text into ASCII art using predefined banner files.
+
+The program supports three banner styles: `standard`, `shadow`, and `thinkertoy`.
 
 ## Features
 
 - Converts text into ASCII art.
-- Supports three banner styles:
-  - `standard`
-  - `shadow`
-  - `thinkertoy`
+- Supports three banner styles: `standard`, `shadow`, and `thinkertoy`.
 - Uses `standard` as the default banner style.
-- Supports multiple lines of text using `\n`.
+- Supports multiline text using newline characters.
 - Displays `?` for characters outside the supported printable ASCII range.
-- Checks command-line arguments and validates the selected banner.
+- Validates command-line arguments and banner names.
+- Reads character drawings from external banner files.
 
 ## Requirements
 
 - Go installed on your system.
-- One of the supported banner files in the project directory:
-  - `standard.txt`
-  - `shadow.txt`
-  - `thinkertoy.txt`
+- The banner files must be present in the project directory.
 
 ## Project Structure
 
@@ -36,35 +33,35 @@ ascii-art/
 
 ## Usage
 
-Run the program with the following syntax:
+Run the program using the following syntax:
 
 ```bash
 go run . "<text>" [standard|shadow|thinkertoy]
 ```
 
-The banner argument is optional. If omitted, the program uses `standard`.
+The banner argument is optional. If no banner is specified, the program uses `standard`.
 
 ### Examples
 
-**1. Default banner**
+**Default banner**
 
 ```bash
 go run . "Hello"
 ```
 
-**2. Standard banner**
+**Standard banner**
 
 ```bash
 go run . "Hello" standard
 ```
 
-**3. Shadow banner**
+**Shadow banner**
 
 ```bash
 go run . "Hello" shadow
 ```
 
-**4. Thinkertoy banner**
+**Thinkertoy banner**
 
 ```bash
 go run . "Hello" thinkertoy
@@ -72,9 +69,11 @@ go run . "Hello" thinkertoy
 
 ## Multiline Text
 
-You can print multiple lines of ASCII art by including `\n` in the input.
+The program supports multiple lines of text. It separates the input wherever it encounters a newline character (`\n`).
 
-On Linux Mint, use `$'...'` to make Bash interpret `\n` as a newline:
+### On Linux Mint
+
+Use `$'...'` to let Bash interpret `\n` as a real newline:
 
 ```bash
 go run . $'Hello\nWorld'
@@ -86,44 +85,138 @@ You can also specify a banner style:
 go run . $'Hello\nWorld' shadow
 ```
 
-Each line of input is rendered separately.
+### Why use `$'...'`?
 
-## How It Works
+In Bash, double quotes do not normally convert `\n` into a newline. The sequence is usually passed as two characters: a backslash and the letter `n`.
 
-1. **Argument validation:** Checks that the user provides the text and, optionally, a banner name.
-2. **Banner selection:** Uses `standard` by default or selects the requested style.
-3. **File reading:** Reads the corresponding `.txt` banner file.
-4. **Line splitting:** Splits the banner file into individual lines.
-5. **Character lookup:** Uses each character's ASCII code to calculate the position of its drawing in the banner file.
-6. **ASCII rendering:** Uses nested loops to print each drawing row, combining characters horizontally.
-7. **Multiline handling:** Splits the input at newline characters and renders each line separately.
+Bash's `$'...'` syntax interprets `\n` as a newline before passing the argument to the program.
+
+The Go code then splits the input into separate lines:
+
+```go
+strings.Split(text, "\n")
+```
+
+Each input line is rendered independently.
+
+## How the Banner Files Work
+
+The program uses three banner files:
+
+- `standard.txt`
+- `shadow.txt`
+- `thinkertoy.txt`
+
+Each file contains predefined ASCII drawings for printable ASCII characters.
+
+The `standard.txt` file used by this program follows a predictable structure:
+
+- The file begins with an empty line.
+- Each printable ASCII character has a drawing made of 8 lines.
+- Each drawing is followed by a separator newline.
+- Each character therefore occupies a block of 9 lines.
+- The drawings are arranged in ASCII order, starting with the space character, whose ASCII code is `32`.
+
+Because the file follows this consistent layout, the program can calculate where each character's drawing begins instead of searching through the entire file.
+
+**Note:** The formula depends on this specific file structure. A banner file with a different layout may require a different formula.
+
+## The ASCII Position Formula
+
+The program uses this formula to calculate the starting index of a character's drawing:
+
+```go
+start := 1 + (number-32)*9
+```
+
+Where:
+
+- `number` is the ASCII code of the current character.
+- `32` is the ASCII code of the space character, the first character in the banner file.
+- `9` is the number of lines allocated to each character: 8 drawing lines plus 1 separator.
+- `1` accounts for the initial empty line in the file.
+- `start` is the zero-based index of the first drawing line.
+
+
+## How the Program Works
+
+### 1. Validate command-line arguments
+
+The program checks that the user provides either:
+
+- Text only.
+- Text and a banner style.
+
+If the number of arguments is incorrect, the program displays the usage instructions and exits.
+
+### 2. Select the banner
+
+The program uses `standard` by default.
+
+If the user supplies a banner name, the program checks whether it is one of the supported styles.
+
+### 3. Read the banner file
+
+The program reads the selected banner file using `os.ReadFile()`.
+
+If the file cannot be read, the program displays the error and exits.
+
+### 4. Split the banner into lines
+
+The program converts the file contents into a string and separates the lines using `strings.Split()`.
+
+This creates a slice of strings that can be accessed by index.
+
+### 5. Split the input into words or lines
+
+The program splits the user's text at each newline character so that every input line can be rendered separately.
+
+### 6. Find each character's drawing
+
+For every character, the program obtains its ASCII code and calculates the starting index using the formula:
+
+```go
+start := 1 + (number-32)*9
+```
+
+It checks that the character is within the supported range of ASCII codes `32` to `126`.
+
+Characters outside that range are replaced with `?`.
+
+### 7. Render the ASCII art
+
+Each character has eight drawing lines. The program uses nested loops:
+
+- The outer loop iterates through the eight drawing rows.
+- The inner loop iterates through the characters in the input text.
+- The program prints the corresponding drawing row for each character.
+- After each complete drawing row, `fmt.Println()` moves to the next terminal line.
+
+This combines the characters horizontally to create the final ASCII-art output.
 
 ## Error Handling
 
-The program displays an error message when:
-- The number of command-line arguments is incorrect.
-- The banner name is unsupported.
-- A banner file cannot be read.
+The program handles the following situations:
 
-## Technologies
-
-- Go (Golang)
-- Command-line interface
-- ASCII character encoding
-- File handling and string manipulation
+- An incorrect number of command-line arguments.
+- An unsupported banner name.
+- A missing or unreadable banner file.
+- Characters outside the supported printable ASCII range.
 
 ## Limitations
 
 - Supports printable ASCII characters with codes from `32` to `126`.
 - Requires the selected banner file to exist in the project directory.
-- Long ASCII art output may wrap in a narrow terminal window.
+- Uses a formula that assumes the banner file has a consistent structure.
+- Long ASCII-art output may wrap in a narrow terminal window. Increasing the terminal width or reducing the font size can improve readability.
 
 ## Run the Project
 
-Clone or download the project, navigate to its directory, and run:
+Navigate to the project directory and execute:
 
 ```bash
 go run . "Hello" shadow
 ```
 
-Replace `Hello` with your text and `shadow` with `standard` or `thinkertoy` as needed.
+Replace `Hello` with your desired text and `shadow` with `standard` or `thinkertoy` as needed.
+
