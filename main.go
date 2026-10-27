@@ -7,11 +7,26 @@ import (
 )
 
 func main() {
-    data, err := os.ReadFile("standard.txt")
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
+    if len(os.Args)<2 || len(os.Args)>3{ //check if the number of args is correct
+		fmt.Println("Usage: go run . <text> [standard|shadow|thinkertoy]")
+		return
+	}
+	text := os.Args[1] //get the user text
+	banner := "standard" //make it by default
+
+	if len(os.Args) == 3 { //when the nbr of args is correct
+		banner = os.Args[2] //save the banner the use added if nothing is added by default its standard 
+	}
+	if banner != "standard" && banner != "shadow" && banner != "thinkertoy" { // check whether the banner name is valid
+    fmt.Println("Unknown banner:", banner) //error for an unsupported banner
+    return 
+	}
+
+	data, err := os.ReadFile(banner + ".txt") 
+	if err != nil { 
+		fmt.Println(err) 
+		return 
+	}
 
     lines := strings.Split(string(data), "\n")
 
@@ -21,9 +36,8 @@ func main() {
 			return // Stop because no text was provided.
 		}
 
-		text := os.Args[1] // Get the text supplied in the terminal.
 
-		
+
 		/*
 			to have a new line : add\n example:go run . "Hello\nWorld" , 
 			but for mint linux:$'...' example:go run . $'Hello\nWorld'
