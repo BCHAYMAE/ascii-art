@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
     "fmt"
     "os"
     "strings"
@@ -16,35 +15,22 @@ func main() {
 
     lines := strings.Split(string(data), "\n")
 
-	reader := bufio.NewReader(os.Stdin) // input terminal
-	fmt.Print("Enter text: ")     
+			
+		if len(os.Args) < 2 { // check whether the user provided text.
+			fmt.Println("Usage: go run . \"Hello\"") // Show how to run the program.
+			return // Stop because no text was provided.
+		}
 
-	var input strings.Builder //to collect all input lines.
-	for { // keep reading lines until the user enters the end-of-input signal
+		text := os.Args[1] // Get the text supplied in the terminal.
 
+		
 		/*
-		to send end of input signal in terminal
-		-windows:press Ctrl + Z then Enter
-		-linix mint: press Ctrl + D then Enter
+			to have a new line : add\n example:go run . "Hello\nWorld" , 
+			but for mint linux:$'...' example:go run . $'Hello\nWorld'
 		*/
 
-		line, err := reader.ReadString('\n') // Read one line, including its newline
-		input.WriteString(line) // add the line to the collected input
-		if err != nil { 
-			break 
-		}
-	}
-	text := input.String() // convert the input into one string
-	text = strings.TrimSuffix(text, "\n") 
-	text = strings.TrimSuffix(text, "\r") 
-	
-	if err != nil && len(text) == 0 { 
-		fmt.Println(err) 
-		return            
-	}
 
-	text = strings.TrimSuffix(text, "\n") 
-	text = strings.TrimSuffix(text, "\r")
+
 
 		/*for i:=0; i<len(text); i++{
 			number := int(text[i]) 	//get the ascii nbr of the current char
