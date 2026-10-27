@@ -1,0 +1,129 @@
+# ASCII Art
+
+A simple command-line program written in **Go (Golang)** that converts text into ASCII art using predefined banner files.
+
+## Features
+
+- Converts text into ASCII art.
+- Supports three banner styles:
+  - `standard`
+  - `shadow`
+  - `thinkertoy`
+- Uses `standard` as the default banner style.
+- Supports multiple lines of text using `\n`.
+- Displays `?` for characters outside the supported printable ASCII range.
+- Checks command-line arguments and validates the selected banner.
+
+## Requirements
+
+- Go installed on your system.
+- One of the supported banner files in the project directory:
+  - `standard.txt`
+  - `shadow.txt`
+  - `thinkertoy.txt`
+
+## Project Structure
+
+```text
+ascii-art/
+├── main.go
+├── go.mod
+├── standard.txt
+├── shadow.txt
+├── thinkertoy.txt
+└── README.md
+```
+
+## Usage
+
+Run the program with the following syntax:
+
+```bash
+go run . "<text>" [standard|shadow|thinkertoy]
+```
+
+The banner argument is optional. If omitted, the program uses `standard`.
+
+### Examples
+
+**1. Default banner**
+
+```bash
+go run . "Hello"
+```
+
+**2. Standard banner**
+
+```bash
+go run . "Hello" standard
+```
+
+**3. Shadow banner**
+
+```bash
+go run . "Hello" shadow
+```
+
+**4. Thinkertoy banner**
+
+```bash
+go run . "Hello" thinkertoy
+```
+
+## Multiline Text
+
+You can print multiple lines of ASCII art by including `\n` in the input.
+
+On Linux Mint, use `$'...'` to make Bash interpret `\n` as a newline:
+
+```bash
+go run . $'Hello\nWorld'
+```
+
+You can also specify a banner style:
+
+```bash
+go run . $'Hello\nWorld' shadow
+```
+
+Each line of input is rendered separately.
+
+## How It Works
+
+1. **Argument validation:** Checks that the user provides the text and, optionally, a banner name.
+2. **Banner selection:** Uses `standard` by default or selects the requested style.
+3. **File reading:** Reads the corresponding `.txt` banner file.
+4. **Line splitting:** Splits the banner file into individual lines.
+5. **Character lookup:** Uses each character's ASCII code to calculate the position of its drawing in the banner file.
+6. **ASCII rendering:** Uses nested loops to print each drawing row, combining characters horizontally.
+7. **Multiline handling:** Splits the input at newline characters and renders each line separately.
+
+## Error Handling
+
+The program displays an error message when:
+- The number of command-line arguments is incorrect.
+- The banner name is unsupported.
+- A banner file cannot be read.
+
+## Technologies
+
+- Go (Golang)
+- Command-line interface
+- ASCII character encoding
+- File handling and string manipulation
+
+## Limitations
+
+- Supports printable ASCII characters with codes from `32` to `126`.
+- Requires the selected banner file to exist in the project directory.
+- Long ASCII art output may wrap in a narrow terminal window.
+
+## Run the Project
+
+Clone or download the project, navigate to its directory, and run:
+
+```bash
+go run . "Hello" shadow
+```
+
+Replace `Hello` with your text and `shadow` with `standard` or `thinkertoy` as needed.

@@ -30,13 +30,6 @@ func main() {
 
     lines := strings.Split(string(data), "\n")
 
-			
-		if len(os.Args) < 2 { // check whether the user provided text.
-			fmt.Println("Usage: go run . \"Hello\"") // Show how to run the program.
-			return // Stop because no text was provided.
-		}
-
-
 
 		/*
 			to have a new line : add\n example:go run . "Hello\nWorld" , 
